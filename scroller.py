@@ -1,7 +1,6 @@
 # Import the pygame module
 import pygame
 import random
-import time
 
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
@@ -32,22 +31,30 @@ collision_sound = pygame.mixer.Sound('sounds/birds.ogg')
 # Initialize pygame
 pygame.init()
 
+# setup the gameover flag
 gameover = 0
 
 # Define a Player object by extending pygame.sprite.Sprite
 # The surface drwan on the screen is now an attribute of 'player'
 class Player(pygame.sprite.Sprite):
+    '''
+    Define the Player class
+    '''
     def __init__(self):
+        '''
+        Setup the class (the chicken)
+        '''
         super(Player, self).__init__()
         self.surf = pygame.image.load('pics/flying_bird.png').convert_alpha()
         self.surf.set_colorkey((139, 219, 129), RLEACCEL)
-        #self.surf = pygame.Surface((75,25))
-        #self.surf.fill((139, 219, 129))
         self.rect = self.surf.get_rect(center=(80,SCREEN_HEIGHT /2))
 
     # Move the sprite based on user keypresses
 
     def hurt(self):
+        '''
+        Raise during collision with enemies
+        '''
         self.surf = pygame.image.load('pics/hurt_bird.png').convert_alpha()
         self.surf.set_colorkey((139, 219, 129), RLEACCEL)
         self.rect = self.surf.get_rect(
@@ -55,6 +62,9 @@ class Player(pygame.sprite.Sprite):
         )
 
     def update(self, pressed_keys): 
+        '''
+        Object Mouvements
+        '''
         if pressed_keys[K_UP]:
             self.rect.move_ip(0, -30)
         if pressed_keys[K_DOWN]:
@@ -77,7 +87,13 @@ class Player(pygame.sprite.Sprite):
 # Define the enemy object by extending pygame.sprite.Sprite
 # The surfact you draw on the screen is now an attribute of 'enemy'
 class Enemy(pygame.sprite.Sprite):
+    '''
+    Define the Enemy class (the flies)
+    '''
     def __init__(self):
+        '''
+        Setup the class
+        '''
         super(Enemy, self).__init__()
         
         self.surf = pygame.image.load("pics/flying_fly.png").convert_alpha()
@@ -95,6 +111,9 @@ class Enemy(pygame.sprite.Sprite):
     # Move the sprite based on speed
     # Remove the sprite when it passes the left edge of the screen 
     def update(self):
+        '''
+        Object Mouvements
+        '''
         self.rect.move_ip(-self.speed, 0)
         if self.rect.right < 0:
             self.kill()
@@ -102,6 +121,9 @@ class Enemy(pygame.sprite.Sprite):
 # Define the cloud object by extending pygame.sprite.Sprite
 class Cloud(pygame.sprite.Sprite):
     def __init__(self):
+        '''
+        Setup the class
+        '''
         super(Cloud, self).__init__()
         self.surf = pygame.image.load("pics/cloud.png").convert_alpha()
         self.surf.set_colorkey((184, 255, 249), RLEACCEL)
@@ -117,27 +139,34 @@ class Cloud(pygame.sprite.Sprite):
     # Move the cloud based on a constant speed
     # Remove the cloud when it passes the left edge of the screen
     def update(self):
+        '''
+        Object Mouvements
+        '''
         self.rect.move_ip(-self.speed, 0)
         if self.rect.right < 0:
             self.kill()
 
 def redraworder():
-        # Fill the screen with light color
-        screen.fill((184, 255, 249))
+    '''
+    Use to redraw all the object on the screen in the right order
+    background, enemies, player, clouds
+    '''
+    # Fill the screen with light color
+    screen.fill((184, 255, 249))
 
-        # Draw enemies
-        for entity in enemies:
-            screen.blit(entity.surf, entity.rect)
+    # Draw enemies
+    for entity in enemies:
+        screen.blit(entity.surf, entity.rect)
 
-        # Draw player
-        screen.blit(player.surf, player.rect)
+    # Draw player
+    screen.blit(player.surf, player.rect)
 
-        # Draw cloud
-        for entity in clouds:
-            screen.blit(entity.surf, entity.rect)
+    # Draw cloud
+    for entity in clouds:
+        screen.blit(entity.surf, entity.rect)
 
-        # Flip everything to the display
-        pygame.display.flip()
+    # Flip everything to the display
+    pygame.display.flip()
 
 
 # Setup the clock for a decent framerate
@@ -210,14 +239,12 @@ while running:
     clouds.update()
 
     # Check if any enemies have collided with the player
-    if pygame.sprite.spritecollideany(player, enemies):
-        # If so, remove the player and stop the loop
+    if pygame.sprite.spritecollideany(player, enemies) and gameover == 0:
+        # If so, change player to gameover state, fade the music and play the colission_sound
         player.hurt()
-        screen.fill((184, 255, 249))
-        if gameover == 0:
-            pygame.mixer.music.fadeout(3000)
-            collision_sound.play()
-            redraworder()
+        pygame.mixer.music.fadeout(3000)
+        collision_sound.play()
+        redraworder()
 
         gameover = 1
 

@@ -6,8 +6,8 @@
 
 # Conda Installation   
 ```
-conda create -n pygame_tuto python=3.5
-conda activate pygame_tuto
+conda create -n pygame_fun python=3.5
+conda activate pygame_fun
 conda install -c cogsci pygame
 ```
 

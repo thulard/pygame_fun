@@ -2,11 +2,10 @@
 ![demo](/capture/flying_n_crashing.gif)
 
 
-# Requirements
+# Requirement
+![requirements.txt](/requirements.txt)
 
-# Installation   
-
-Using conda
+# Conda Installation   
 ```
 conda create -n pygame_tuto python=3.5
 conda activate pygame_tuto

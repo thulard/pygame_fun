@@ -16,6 +16,9 @@ conda install -c cogsci pygame
 Code adapted from 'PyGame: A Primer on Game Programming in Python' by Jon Fincher
 https://realpython.com/pygame-a-primer
 
+Music by: dAmbient
+https://freesound.org/people/dAmbient/sounds/235349/
+
 Sound by: isaiah658
 https://opengameart.org/content/ambient-bird-sounds
 

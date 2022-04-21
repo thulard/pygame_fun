@@ -19,10 +19,14 @@ from pygame.locals import (
 # Setup for sounds. Defaults are good.
 pygame.mixer.init()
 
+# Load and play background music
+pygame.mixer.music.load('sounds/music.mp3')
+pygame.mixer.music.play(loops=-1)
+
 # Load all sound files
 #move_up_sound = pygame.mixer.Sound("Rising_putter.ogg")
 #move_down_sound = pygame.mixer.Sound("Falling_putter.ogg")
-collision_sound = pygame.mixer.Sound("sounds/hurt_bird.ogg")
+collision_sound = pygame.mixer.Sound('sounds/birds.ogg')
 
 
 # Initialize pygame
@@ -211,6 +215,7 @@ while running:
         player.hurt()
         screen.fill((184, 255, 249))
         if gameover == 0:
+            pygame.mixer.music.fadeout(3000)
             collision_sound.play()
             redraworder()
 
@@ -221,4 +226,3 @@ while running:
     # Ensure program maintains a rate of 30 frames per second
     clock.tick(30)
 
-time.sleep(3)

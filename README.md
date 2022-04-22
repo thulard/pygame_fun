@@ -18,10 +18,10 @@ https://realpython.com/pygame-a-primer
 Music by: dAmbient  
 https://freesound.org/people/dAmbient/sounds/235349/  
 
-Sound by: 
-isaiah658  
+Sound by: isaiah658  
 https://opengameart.org/content/ambient-bird-sounds  
-pyro13djt  
+
+Voice by: pyro13djt  
 https://freesound.org/people/pyro13djt/sounds/331938/  
 
 Image by: bevouliin.com  

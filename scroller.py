@@ -25,14 +25,30 @@ pygame.mixer.music.play(loops=-1)
 # Load all sound files
 #move_up_sound = pygame.mixer.Sound("Rising_putter.ogg")
 #move_down_sound = pygame.mixer.Sound("Falling_putter.ogg")
-collision_sound = pygame.mixer.Sound('sounds/birds.ogg')
-
+collision_sound1 = pygame.mixer.Sound('sounds/ouch1.ogg')
+collision_sound2 = pygame.mixer.Sound('sounds/ouch2.ogg')
+collision_sound3 = pygame.mixer.Sound('sounds/ouch3.ogg')
+collision_sounds = [collision_sound1,collision_sound2,collision_sound3]
+collision_sound = random.choice(collision_sounds)
+death_sound = pygame.mixer.Sound('sounds/birds.ogg')
 
 # Initialize pygame
 pygame.init()
 
 # setup the gameover flag
 gameover = 0
+life = 3
+safe = 0
+
+# frame update counter
+framecnt = 0 
+
+# Setup the clock for a decent framerate
+clock = pygame.time.Clock()
+
+# Define constants for the screen width and height
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
 # Define a Player object by extending pygame.sprite.Sprite
 # The surface drwan on the screen is now an attribute of 'player'
@@ -45,7 +61,10 @@ class Player(pygame.sprite.Sprite):
         Setup the class (the chicken)
         '''
         super(Player, self).__init__()
-        self.surf = pygame.image.load('pics/flying_bird.png').convert_alpha()
+        # setup the sprite loop
+        self.player_frames = ['flying_bird1.png','flying_bird2.png','flying_bird3.png','flying_bird4.png']
+        self.current_frame = -1
+        self.surf = pygame.image.load('pics/flying_bird1.png').convert_alpha()
         self.surf.set_colorkey((139, 219, 129), RLEACCEL)
         self.rect = self.surf.get_rect(center=(80,SCREEN_HEIGHT /2))
 
@@ -61,18 +80,35 @@ class Player(pygame.sprite.Sprite):
             center=(SCREEN_WIDTH /2 , SCREEN_HEIGHT /2)
         )
 
+    def backfromdeath(self):
+        '''
+        Recover after death
+        '''
+        self.surf = pygame.image.load('pics/flying_bird1.png').convert_alpha()
+        self.surf.set_colorkey((139, 219, 129), RLEACCEL)
+        self.rect = self.surf.get_rect(center=(80,SCREEN_HEIGHT /2))
+
+    def frame(self):
+        '''
+        change frame
+        '''
+        self.current_frame+=1
+        if self.current_frame > 3:
+            self.current_frame=0
+        self.surf = pygame.image.load(''.join(['pics/',self.player_frames[self.current_frame]])).convert_alpha()
+
     def update(self, pressed_keys): 
         '''
         Object Mouvements
         '''
         if pressed_keys[K_UP]:
-            self.rect.move_ip(0, -30)
+            self.rect.move_ip(0, -20)
         if pressed_keys[K_DOWN]:
-            self.rect.move_ip(0, 30)
+            self.rect.move_ip(0, 20)
         if pressed_keys[K_LEFT]:
-            self.rect.move_ip(-30, 0)
+            self.rect.move_ip(-20, 0)
         if pressed_keys[K_RIGHT]:
-            self.rect.move_ip(30, 0)
+            self.rect.move_ip(20, 0)
 
         # Keep player on the screen
         if self.rect.left < 0:
@@ -106,7 +142,7 @@ class Enemy(pygame.sprite.Sprite):
                 random.randint(0, SCREEN_HEIGHT),
             )
         )
-        self.speed = random.randint(5, 20)
+        self.speed = random.randint(5, 15)
 
     # Move the sprite based on speed
     # Remove the sprite when it passes the left edge of the screen 
@@ -168,13 +204,6 @@ def redraworder():
     # Flip everything to the display
     pygame.display.flip()
 
-
-# Setup the clock for a decent framerate
-clock = pygame.time.Clock()
-
-# Define constants for the screen width and height
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
 # Create the screen object
 # The size is determined by the constant SCREEN_WIDTH and SCREEN_HEIGHT
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -184,6 +213,13 @@ ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 1000) # In ms
 ADDCLOUD = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDCLOUD, 3000)
+
+# Set time for frame update
+FRAME = pygame.USEREVENT + 3
+pygame.time.set_timer(FRAME, 50)
+
+# Set time for safe update
+SAFE = pygame.USEREVENT + 4
 
 # Instatiate player
 player = Player()
@@ -228,28 +264,47 @@ while running:
             clouds.add(new_cloud)
             all_sprites.add(new_cloud)
 
+        elif event.type == FRAME and gameover == 0:
+            # update the fram
+            player.frame()
+
+        elif event.type == SAFE and safe == 1:
+            safe = 0
+        
     # Get all the keys currently pressed
     pressed_keys = pygame.key.get_pressed()
     
     # Update the player sprite based on user keypresses
-    player.update(pressed_keys)
+    if gameover == 0:
+        # update location
+        player.update(pressed_keys)            
     
     # Update the enemy position
     enemies.update()
     clouds.update()
 
     # Check if any enemies have collided with the player
-    if pygame.sprite.spritecollideany(player, enemies) and gameover == 0:
+    if pygame.sprite.spritecollideany(player, enemies) and gameover == 0 and safe == 0:
         # If so, change player to gameover state, fade the music and play the colission_sound
         player.hurt()
         pygame.mixer.music.fadeout(3000)
-        collision_sound.play()
+        
         redraworder()
-
-        gameover = 1
+        life -= 1
+        if life == 0:
+            death_sound.play()
+            gameover = 1
+        else:
+            collision_sound = random.choice(collision_sounds)
+            collision_sound.play()
+            # define a safe period
+            pygame.time.delay(500)
+            pygame.time.set_timer(SAFE, 2000)
+            safe = 1    
+            # replace player on the left
+            player.backfromdeath()
 
     redraworder()  
 
-    # Ensure program maintains a rate of 30 frames per second
-    clock.tick(30)
-
+    # Ensure program maintains a rate of 60 frames per second
+    clock.tick(60)

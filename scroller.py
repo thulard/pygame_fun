@@ -286,20 +286,21 @@ while running:
     # Check if any enemies have collided with the player
     if pygame.sprite.spritecollideany(player, enemies) and gameover == 0 and safe == 0:
         # If so, change player to gameover state, fade the music and play the colission_sound
-        player.hurt()
-        pygame.mixer.music.fadeout(3000)
-        
-        redraworder()
+        player.hurt()   
         life -= 1
+        collision_sound = random.choice(collision_sounds)
+        collision_sound.play()     
+        redraworder()
         if life == 0:
+            # Gameover
+            pygame.mixer.music.fadeout(3000)
             death_sound.play()
             gameover = 1
         else:
-            collision_sound = random.choice(collision_sounds)
-            collision_sound.play()
+            # player is hurt and for to a safe period
             # define a safe period
             pygame.time.delay(500)
-            pygame.time.set_timer(SAFE, 2000)
+            pygame.time.set_timer(SAFE, 1000)
             safe = 1    
             # replace player on the left
             player.backfromdeath()

@@ -1,5 +1,5 @@
 # Demo
-![demo](/capture/flying_n_crashing.gif)
+![demo](/capture/demo.gif)
 
 # Requirement
 ![requirements.txt](/requirements.txt)

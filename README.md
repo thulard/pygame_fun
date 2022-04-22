@@ -1,5 +1,5 @@
 # Demo
-![demo](/capture/demo.gif)
+<img src="./capture/demo.gif" alt="demo gic" width="400">
 
 # Requirement
 ![requirements.txt](/requirements.txt)
